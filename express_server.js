@@ -38,3 +38,22 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id, longURL: ` What goes here? ` };
   res.render("urls_show", templateVars);
 });
+
+
+//Add a POST Route to Receive the Form Submission
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
+
+//Generate a Random Short URL ID
+function generateRandomString() {
+  const alphanumericChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let randomString = '';
+  for (let i = 0; i < 6; i++) {
+    const randomIndex = Math.floor(Math.random() * alphanumericChars.length);
+    randomString += alphanumericChars[randomIndex];
+  }
+  return randomString;
+}
+console.log(generateRandomString('www.google.com'));
