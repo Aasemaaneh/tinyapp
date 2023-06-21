@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs"); //This tells the Express app to use EJS as its templating engine.ad
-
+app.use(express.urlencoded({ extended: true })); //translate, or parse the body. This feature is part of Express.
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -28,6 +28,10 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
     const templateVars = { urls: urlDatabase };
     res.render("urls_index", templateVars);
+});
+//Add a GET Route to Show the Form
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
 });
 app.get("/urls/:id", (req, res) => {
   const templateVars = { 
