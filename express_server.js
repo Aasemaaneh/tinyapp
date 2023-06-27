@@ -38,7 +38,11 @@ app.get("/urls/:id", (req, res) => {
     id: req.params.id, longURL: ` What goes here? ` };
   res.render("urls_show", templateVars);
 });
-
+//Routing on Server
+app.post("/urls/:id/delete", (req, res) => {
+    delete urlDatabase[req.params.id];
+    res.redirect("/urls");
+  });
 
 //Add a POST Route to Receive the Form Submission
 app.post("/urls", (req, res) => {
@@ -58,7 +62,7 @@ app.post("/urls", (req, res) => {
 
 app.get("/u/:id", (req, res) => {
     const longURL = urlDatabase[req.params.id];
-    console.log(longURL);
+    //console.log(longURL);
     res.redirect(longURL);
 });
 
@@ -72,4 +76,3 @@ function generateRandomString() {
   }
   return randomString;
 }
-console.log(generateRandomString('www.google.com'));
