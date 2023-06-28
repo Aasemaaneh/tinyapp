@@ -27,6 +27,11 @@ const users = {
       email: "user2@example.com",
       password: "dishwasher-funk",
     },
+    s: {
+        id: "s",
+        email: "s@s.com",
+        password: "sss",
+      },
   };
 
 
@@ -105,17 +110,25 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
-    const longURL = urlDatabase[req.params.id];
-    res.redirect(longURL);
+    const shortURL = req.params.id;
+    if (urlDatabase.hasOwnProperty(shortURL)) {
+        const longURL = urlDatabase[shortURL];
+        res.redirect(longURL);
+      } else {
+        res.status(404).send("<html><body>The requested shortened URL does not exist.</body></html>");
+      }
 });
+  
 
 // GET login page
 app.get("/login", (req, res) => {
-    const templateVars = { 
-        user: users[req.cookies.user_id]};
+    
     if (req.cookies.user_id) {
         res.redirect('/urls');
+        return;
       } else {
+        const templateVars = { 
+          user: users[req.cookies.user_id]};
         res.render("login", templateVars);
       }
 });
@@ -150,14 +163,15 @@ app.post("/logout", (req, res) => {
 
 // register endnote rendering:
 app.get("/register", (req, res) => {
-    const templateVars = {
-      user: users[req.cookies.user_id]
-    };
+    
     if (req.cookies.user_id) {
         res.redirect('/urls');
-      } else {
-        res.render("register", templateVars);
-      }
+        return;
+    }
+    const templateVars = {
+      user: users[req.cookies.user_id]
+    }
+    res.render("register", templateVars);
   });
   
   //Create a Registration Handler
@@ -181,7 +195,7 @@ app.post("/register", (req, res) => {
       password: req.body.password
     };
     users[newuser.id] = newuser;
-    res.cookie("user_id", newuser.id);
+    //res.cookie("user_id", newuser.id); The usser should login after registeration!
     }
     res.redirect("/urls");
 });
