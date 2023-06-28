@@ -120,8 +120,8 @@ app.post("/login", (req, res) => {
 
 //The Logout Route
 app.post("/logout", (req, res) => {
-    res.clearCookie('username');
-    res.redirect("/urls");
+    res.clearCookie('user_id');
+    res.redirect("/register");
 });
 
 
@@ -135,28 +135,39 @@ app.get("/register", (req, res) => {
 
 //Create a Registration Handler
 app.post("/register", (req, res) => {
-    const newuser = {
+    const { email, password } = req.body;
+    //
+    if (!email || !password) {
+        res.status(400).send("Email and password cannot be empty");
+        return;
+      }
+    //
+    const existingUser = getUserByEmail(email);
+    if (existingUser) {
+      res.status(400).send("Email already registered");
+      return;
+    } else {
+      
+      const newuser = {
       id: generateRandomString(),
       email: req.body.email,
       password: req.body.password
     };
-  
-    let existingUser = false;
-  
-    for (const userId in users) {
+    users[newuser.id] = newuser;
+    res.cookie("user_id", newuser.id);
+    }
+    res.redirect("/urls");
+});
+
+
+function getUserByEmail(email) {
+  for (const userId in users) {
       const user = users[userId];
-      if (user.email === newuser.email) {
-        res.status(400).send("Email already registered");
-        existingUser = true;
+      if (user.email === email) {
+        
+        return user;
         
       }
-    }
-  
-    if (!existingUser) {
-      users[newuser.id] = newuser;
-    }
-  
-    res.cookie("user_id", newuser.id);
-    res.redirect("/urls");
-  });
-  
+  }
+  return null;
+}
