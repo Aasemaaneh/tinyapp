@@ -96,6 +96,12 @@ function generateRandomString() {
 app.post("/login", (req, res) => {
     const userName = req.body.username;
     res.cookie('username', userName);
-    
     res.redirect("/urls");
 });
+
+//The Logout Route
+app.post("/logout", (req, res) => {
+    res.clearCookie('username');
+    res.redirect("/urls");
+});
+
