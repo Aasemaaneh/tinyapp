@@ -3,7 +3,7 @@ const app = express();
 //const cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
-const PORT = 8080; // default port 8080
+const PORT = 8080; 
 
 //Helperfunctions:
 const urlsForUser = require("./urlsForUser");
@@ -11,13 +11,13 @@ const getUserByEmail = require("./getUserByEmail");
 const generateRandomString = require("./generateRandomString");
 
 // Middleware
-app.set("view engine", "ejs"); //This tells the Express app to use EJS as its templating engine.ad
-app.use(express.urlencoded({ extended: true })); //translate, or parse the body. This feature is part of Express.
+app.set("view engine", "ejs"); 
+app.use(express.urlencoded({ extended: true })); 
 //app.use(cookieParser());
 app.use(cookieSession({
     name: 'session',
-    keys: ['secretKey'], // Replace with your own secret key(s)
-    maxAge: 24 * 60 * 60 * 1000 // Cookie expiration time (24 hours in this example)
+    keys: ['secretKey'],
+    maxAge: 24 * 60 * 60 * 1000 
   }));
 
 // Database 
@@ -66,7 +66,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-//Sending Data to urls_index.ejs
+
 app.get("/urls", (req, res) => {
     //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
@@ -76,14 +76,14 @@ app.get("/urls", (req, res) => {
     }
 
     const templateVars = {
-        urls: urlsForUser(userId,urlDatabase),//urlDatabase,
+        urls: urlsForUser(userId,urlDatabase),
         user: users[userId]
     };
     //console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
-//Add a GET Route to Show the Form
+
 app.get("/urls/new", (req, res) => {
     //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
@@ -163,7 +163,6 @@ app.post("/urls/:id/delete", (req, res) => {
     res.redirect("/urls");
 });
 
-//Add a POST Route to Receive the Form Submission
 app.post("/urls", (req, res) => {
     //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
@@ -177,9 +176,7 @@ app.post("/urls", (req, res) => {
         longURL: longURL,
         userID: userId,
     };
-    //Redirect After Form Submission
     res.redirect(`/urls`);
-    //res.send("Ok"); 
 });
 
 app.get("/u/:id", (req, res) => {
@@ -193,7 +190,6 @@ app.get("/u/:id", (req, res) => {
 });
   
 
-// GET login page
 app.get("/login", (req, res) => {
     //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
@@ -206,7 +202,7 @@ app.get("/login", (req, res) => {
         res.render("login", templateVars);
       }
 });
-//The Login Route
+
 app.post("/login", (req, res) => {
     //const userName = req.body.username;
     const { email, password } = req.body;
@@ -229,7 +225,7 @@ app.post("/login", (req, res) => {
     res.redirect("/urls");
 });
 
-//The Logout Route
+
 app.post("/logout", (req, res) => {
     //res.clearCookie('user_id');
     req.session = null;
@@ -237,7 +233,7 @@ app.post("/logout", (req, res) => {
 });
 
 
-// register endnote rendering:
+
 app.get("/register", (req, res) => {
     //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
@@ -251,7 +247,7 @@ app.get("/register", (req, res) => {
     res.render("register", templateVars);
   });
   
-  //Create a Registration Handler
+
 app.post("/register", (req, res) => {
     const { email, password } = req.body;
     //
@@ -273,12 +269,14 @@ app.post("/register", (req, res) => {
     };
     users[newuser.id] = newuser;
     console.log(users);
-    //res.cookie("user_id", newuser.id); The user should login after registeration!
+
     }
     
     //res.redirect("/login");
     res.status(200).send("<html><body>Registered Successfully! Please <a href='/login'>login</a>.</body></html>");
 });
+
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
