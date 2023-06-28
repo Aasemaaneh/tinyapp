@@ -10,6 +10,22 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+//create user objects :
+const users = {
+    userRandomID: {
+      id: "userRandomID",
+      email: "user@example.com",
+      password: "purple-monkey-dinosaur",
+    },
+    user2RandomID: {
+      id: "user2RandomID",
+      email: "user2@example.com",
+      password: "dishwasher-funk",
+    },
+  };
+
+
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -108,10 +124,7 @@ app.post("/logout", (req, res) => {
 
 // register endnote rendering:
 app.get("/register", (req, res) => {
-    const templateVars = { 
-      username: req.cookies["username"],
-      email: req.cookies["email"],
-      password: req.cookies["password"]
-    };
-    res.render("register", templateVars);
-  });
+
+    res.render("register");
+});
+
