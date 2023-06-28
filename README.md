@@ -4,10 +4,13 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-![docs/Login.png](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/Login.png?raw=true)  
-![docs/registered.png](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/registered.png?raw=true)
-![docs/url_page.png](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/url_page?raw=true)  
-![docs/urls_id.png](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/urls_id?raw=true)
+!["Login page"](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/Login.png?raw=true)  
+
+!["After Registeration"](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/registered.png?raw=true)
+
+!["URLs page for a user"](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/url_page.png?raw=true)  
+
+![editing a url for a user](https://github.com/Aasemaaneh/tinyapp/blob/feature/user-registration/docs/urls_id.png?raw=true)
 
 ## Dependencies
 
