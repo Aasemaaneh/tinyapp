@@ -105,3 +105,13 @@ app.post("/logout", (req, res) => {
     res.redirect("/urls");
 });
 
+
+// register endnote rendering:
+app.get("/register", (req, res) => {
+    const templateVars = { 
+      username: req.cookies["username"],
+      email: req.cookies["email"],
+      password: req.cookies["password"]
+    };
+    res.render("register", templateVars);
+  });
