@@ -44,19 +44,21 @@ app.get("/hello", (req, res) => {
 });
 //Sending Data to urls_index.ejs
 app.get("/urls", (req, res) => {
-    const templateVars = {urls: urlDatabase,
-        username: req.cookies["username"],};
+    const templateVars = {
+        urls: urlDatabase,
+        user: users[req.cookies.user_id]};
     res.render("urls_index", templateVars);
 });
+
 //Add a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
     const templateVars = {
-      username: req.cookies["username"],};
+        user: users[req.cookies.user_id]};
   res.render("urls_new",templateVars);
 });
 app.get("/urls/:id", (req, res) => {
   const templateVars = { 
-    id: req.params.id, longURL: urlDatabase[req.params.id], username: req.cookies["username"]};
+    id: req.params.id, longURL: urlDatabase[req.params.id], user: users[req.cookies.user_id]};
   res.render("urls_show", templateVars);
 });
 app.post("/urls/:id", (req, res) => {
@@ -110,8 +112,9 @@ function generateRandomString() {
 
 //The Login Route
 app.post("/login", (req, res) => {
-    const userName = req.body.username;
-    res.cookie('username', userName);
+    //const userName = req.body.username;
+    const user = users[req.cookies["user_id"]];
+    res.cookie('username', user.id);
     res.redirect("/urls");
 });
 
@@ -124,7 +127,36 @@ app.post("/logout", (req, res) => {
 
 // register endnote rendering:
 app.get("/register", (req, res) => {
-
-    res.render("register");
+  const templateVars = {
+    user: users[req.cookies.user_id]
+  };
+  res.render("register", templateVars);
 });
 
+//Create a Registration Handler
+app.post("/register", (req, res) => {
+    const newuser = {
+      id: generateRandomString(),
+      email: req.body.email,
+      password: req.body.password
+    };
+  
+    let existingUser = false;
+  
+    for (const userId in users) {
+      const user = users[userId];
+      if (user.email === newuser.email) {
+        res.status(400).send("Email already registered");
+        existingUser = true;
+        
+      }
+    }
+  
+    if (!existingUser) {
+      users[newuser.id] = newuser;
+    }
+  
+    res.cookie("user_id", newuser.id);
+    res.redirect("/urls");
+  });
+  
