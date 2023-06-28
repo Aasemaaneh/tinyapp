@@ -55,9 +55,13 @@ app.get("/urls", (req, res) => {
 
 //Add a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-    const templateVars = {
-        user: users[req.cookies.user_id]};
-  res.render("urls_new",templateVars);
+    if(req.cookies.user_id) {
+      const templateVars = {
+          user: users[req.cookies.user_id]};
+      res.render("urls_new",templateVars);
+    } else {
+        res.redirect('/login');
+    }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -88,7 +92,10 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Add a POST Route to Receive the Form Submission
 app.post("/urls", (req, res) => {
-    //console.log(req.body); 
+    if (!req.cookies.user_id) {
+        res.status(401).send("<html><body>You need to be logged in to shorten URLs.</body></html>");
+        return;
+      }
     const longURL = req.body.longURL;
     const shortURL = generateRandomString();
     urlDatabase[shortURL] = longURL;
