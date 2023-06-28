@@ -5,6 +5,10 @@ var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 
+//Helperfunctions:
+const urlsForUser = require("./urlsForUser");
+const getUserByEmail = require("./getUserByEmail");
+const generateRandomString = require("./generateRandomString");
 
 // Middleware
 app.set("view engine", "ejs"); //This tells the Express app to use EJS as its templating engine.ad
@@ -40,10 +44,10 @@ const users = {
       email: "user2@example.com",
       password: bcrypt.hashSync("dishwasher-funk", 10),
     },
-    s: {
+    aJ48lW: {
         id: "aJ48lW", //to match urls id
-        email: "s@s.com",
-        password: bcrypt.hashSync("sss", 10),
+        email: "test@test.com",
+        password: bcrypt.hashSync("TtT", 10),
       },
   };
 
@@ -72,7 +76,7 @@ app.get("/urls", (req, res) => {
     }
 
     const templateVars = {
-        urls: urlsForUser(userId),//urlDatabase,
+        urls: urlsForUser(userId,urlDatabase),//urlDatabase,
         user: users[userId]
     };
     //console.log(templateVars);
@@ -101,7 +105,7 @@ app.get("/urls/:id", (req, res) => {
         return;
       }
 
-      const userURLs = urlsForUser(userId);
+      const userURLs = urlsForUser(userId,urlDatabase);
     if (!userURLs[id]) {
       res.status(403).send("<html><body>You don't have permission to access this URL.</body></html>");
       return;
@@ -125,7 +129,7 @@ app.post("/urls/:id", (req, res) => {
     return;
   }
 
-  const userURLs = urlsForUser(userId);
+  const userURLs = urlsForUser(userId,urlDatabase);
   if (!userURLs[id]) {
     res.status(403).send("<html><body>You don't have permission to access this URL or the URL does't exist.</body></html>");
     return;
@@ -149,7 +153,7 @@ app.post("/urls/:id/delete", (req, res) => {
       return;
     }
   
-    const userURLs = urlsForUser(userId);
+    const userURLs = urlsForUser(userId,urlDatabase);
     if (!userURLs[id]) {
       res.status(403).send("<html><body>You don't have permission to delete this URL OR the URL doesn't exist.</body></html>");
       return;
@@ -174,7 +178,7 @@ app.post("/urls", (req, res) => {
         userID: userId,
     };
     //Redirect After Form Submission
-    res.redirect(`/urls/${id}`);
+    res.redirect(`/urls`);
     //res.send("Ok"); 
 });
 
@@ -198,7 +202,7 @@ app.get("/login", (req, res) => {
         return;
       } else {
         const templateVars = { 
-          user: users[ req.session.user_id]};
+          user: null};
         res.render("login", templateVars);
       }
 });
@@ -206,14 +210,12 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     //const userName = req.body.username;
     const { email, password } = req.body;
-    
-    
     if (!email || !password) {
         res.status(400).send("Email and password cannot be empty");
         return;
     }
 
-    const existingUser = getUserByEmail(email);
+    const existingUser = getUserByEmail(email, users);
     if (!existingUser) {
       res.status(403).send("Email is not registered");
       return;
@@ -244,7 +246,7 @@ app.get("/register", (req, res) => {
         return;
     }
     const templateVars = {
-      user: users[userId]
+      user: null,
     }
     res.render("register", templateVars);
   });
@@ -258,7 +260,7 @@ app.post("/register", (req, res) => {
         return;
       }
     //
-    const existingUser = getUserByEmail(email);
+    const existingUser = getUserByEmail(email, users);
     if (existingUser) {
       res.status(400).send("Email already registered");
       return;
@@ -267,46 +269,16 @@ app.post("/register", (req, res) => {
       const newuser = {
       id: generateRandomString(),
       email,
-      password: hashedPass
+      password: hashedPass,
     };
     users[newuser.id] = newuser;
+    console.log(users);
     //res.cookie("user_id", newuser.id); The user should login after registeration!
     }
-    res.redirect("/urls");
+    
+    //res.redirect("/login");
+    res.status(200).send("<html><body>Registered Successfully! Please <a href='/login'>login</a>.</body></html>");
 });
-
-// Helper functions
-//1 .  to generate a random short URL ID
-function generateRandomString() {
-    const alphanumericChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let randomString = '';
-    for (let i = 0; i < 6; i++) {
-      const randomIndex = Math.floor(Math.random() * alphanumericChars.length);
-      randomString += alphanumericChars[randomIndex];
-    }
-    return randomString;
-}
-//2.   to get user by email
-function getUserByEmail(email) {
-    for (const userId in users) {
-        const user = users[userId];
-        if (user.email === email) {
-          return user;
-        }
-    }
-    return null;
-}
-
-//3. urls for each user
-function urlsForUser(userId) {
-    const userURLs = {};
-    for (const id in urlDatabase) {
-      if (urlDatabase[id].userID === userId) {
-        userURLs[id] = urlDatabase[id];
-      }
-    }
-    return userURLs;
-  }
 // Start the server
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
