@@ -109,7 +109,12 @@ function generateRandomString() {
   }
   return randomString;
 }
-
+// GET login page
+app.get("/login", (req, res) => {
+    const templateVars = { 
+        user: users[req.cookies.user_id]};
+    res.render("login", templateVars);
+});
 //The Login Route
 app.post("/login", (req, res) => {
     //const userName = req.body.username;
@@ -121,7 +126,7 @@ app.post("/login", (req, res) => {
 //The Logout Route
 app.post("/logout", (req, res) => {
     res.clearCookie('user_id');
-    res.redirect("/register");
+    res.redirect("/login");
 });
 
 
