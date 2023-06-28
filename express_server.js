@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 
@@ -8,7 +9,12 @@ const PORT = 8080; // default port 8080
 // Middleware
 app.set("view engine", "ejs"); //This tells the Express app to use EJS as its templating engine.ad
 app.use(express.urlencoded({ extended: true })); //translate, or parse the body. This feature is part of Express.
-app.use(cookieParser());
+//app.use(cookieParser());
+app.use(cookieSession({
+    name: 'session',
+    keys: ['secretKey'], // Replace with your own secret key(s)
+    maxAge: 24 * 60 * 60 * 1000 // Cookie expiration time (24 hours in this example)
+  }));
 
 // Database 
 //urls
@@ -58,7 +64,8 @@ app.get("/hello", (req, res) => {
 
 //Sending Data to urls_index.ejs
 app.get("/urls", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     if (!userId) {
       res.send("<html><body>Please <a href='/login'>login</a> or <a href='/register'>register</a> to access URLs.</body></html>");
       return;
@@ -74,7 +81,8 @@ app.get("/urls", (req, res) => {
 
 //Add a GET Route to Show the Form
 app.get("/urls/new", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     if(userId) {
       const templateVars = {
           user: users[userId]};
@@ -85,7 +93,8 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     const id = req.params.id;    
     if (!userId) {
         res.status(401).send("<html><body>Please <a href='/login'>login</a> or <a href='/register'>register</a> to access this URL.</body></html>");
@@ -107,7 +116,8 @@ app.get("/urls/:id", (req, res) => {
 
 
 app.post("/urls/:id", (req, res) => {
-  const userId = req.cookies.user_id;
+  //const userId = req.cookies.user_id;
+  const userId = req.session.user_id;
   const id = req.params.id;
 
   if (!userId) {
@@ -130,7 +140,8 @@ app.post("/urls/:id/post", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     const id = req.params.id;
   
     if (!userId) {
@@ -150,7 +161,8 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //Add a POST Route to Receive the Form Submission
 app.post("/urls", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     if (!userId) {
       res.status(401).send("<html><body>Please <a href='/login'>login</a> or <a href='/register'>register</a> to shorten URLs.</body></html>");
       return;
@@ -179,13 +191,14 @@ app.get("/u/:id", (req, res) => {
 
 // GET login page
 app.get("/login", (req, res) => {
-    const userId = req.cookies.user_id;
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     if (userId) {
         res.redirect('/urls');
         return;
       } else {
         const templateVars = { 
-          user: users[req.cookies.user_id]};
+          user: users[ req.session.user_id]};
         res.render("login", templateVars);
       }
 });
@@ -194,7 +207,7 @@ app.post("/login", (req, res) => {
     //const userName = req.body.username;
     const { email, password } = req.body;
     
-    const user = getUserByEmail(email);
+    
     if (!email || !password) {
         res.status(400).send("Email and password cannot be empty");
         return;
@@ -204,25 +217,28 @@ app.post("/login", (req, res) => {
     if (!existingUser) {
       res.status(403).send("Email is not registered");
       return;
-    } else if (bcrypt.compareSync(password, existingUser.password)) {
+    } else if (!bcrypt.compareSync(password, existingUser.password)) {
        res.status(403).send("Password is incorrect");
        return;
     }else {
-    res.cookie("user_id", existingUser.id);
+    //res.cookie("user_id", existingUser.id);
+    req.session.user_id = existingUser.id;
     }
     res.redirect("/urls");
 });
 
 //The Logout Route
 app.post("/logout", (req, res) => {
-    res.clearCookie('user_id');
+    //res.clearCookie('user_id');
+    req.session = null;
     res.redirect("/login");
 });
 
 
 // register endnote rendering:
 app.get("/register", (req, res) => {
-    const userId = req.cookies.user_id
+    //const userId = req.cookies.user_id;
+    const userId = req.session.user_id;
     if (userId) {
         res.redirect('/urls');
         return;
