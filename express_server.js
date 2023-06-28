@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
+const cookieParser = require('cookie-parser');
 const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs"); //This tells the Express app to use EJS as its templating engine.ad
 app.use(express.urlencoded({ extended: true })); //translate, or parse the body. This feature is part of Express.
+app.use(cookieParser());
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -86,3 +88,11 @@ function generateRandomString() {
   }
   return randomString;
 }
+
+//The Login Route
+app.post("/login", (req, res) => {
+    const userName = req.body.username;
+    res.cookie('username', userName);
+    
+    res.redirect("/urls");
+});
