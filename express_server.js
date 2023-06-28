@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const PORT = 8080; // default port 8080
 
 
@@ -26,17 +27,17 @@ const users = {
     userRandomID: {
       id: "userRandomID",
       email: "user@example.com",
-      password: "purple-monkey-dinosaur",
+      password: bcrypt.hashSync("purple-monkey-dinosaur", 10),
     },
     user2RandomID: {
       id: "user2RandomID",
       email: "user2@example.com",
-      password: "dishwasher-funk",
+      password: bcrypt.hashSync("dishwasher-funk", 10),
     },
     s: {
         id: "aJ48lW", //to match urls id
         email: "s@s.com",
-        password: "sss",
+        password: bcrypt.hashSync("sss", 10),
       },
   };
 
@@ -67,7 +68,7 @@ app.get("/urls", (req, res) => {
         urls: urlsForUser(userId),//urlDatabase,
         user: users[userId]
     };
-    console.log(templateVars);
+    //console.log(templateVars);
     res.render("urls_index", templateVars);
 });
 
@@ -192,6 +193,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
     //const userName = req.body.username;
     const { email, password } = req.body;
+    
     const user = getUserByEmail(email);
     if (!email || !password) {
         res.status(400).send("Email and password cannot be empty");
@@ -202,7 +204,7 @@ app.post("/login", (req, res) => {
     if (!existingUser) {
       res.status(403).send("Email is not registered");
       return;
-    } else if (password !== existingUser.password ) {
+    } else if (bcrypt.compareSync(password, existingUser.password)) {
        res.status(403).send("Password is incorrect");
        return;
     }else {
@@ -245,11 +247,11 @@ app.post("/register", (req, res) => {
       res.status(400).send("Email already registered");
       return;
     } else {
-      
+      const hashedPass = bcrypt.hashSync(password, 10);
       const newuser = {
       id: generateRandomString(),
       email,
-      password
+      password: hashedPass
     };
     users[newuser.id] = newuser;
     //res.cookie("user_id", newuser.id); The user should login after registeration!
