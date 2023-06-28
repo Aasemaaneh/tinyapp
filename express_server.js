@@ -106,7 +106,11 @@ app.get("/u/:id", (req, res) => {
 app.get("/login", (req, res) => {
     const templateVars = { 
         user: users[req.cookies.user_id]};
-    res.render("login", templateVars);
+    if (req.cookies.user_id) {
+        res.redirect('/urls');
+      } else {
+        res.render("login", templateVars);
+      }
 });
 //The Login Route
 app.post("/login", (req, res) => {
@@ -142,7 +146,11 @@ app.get("/register", (req, res) => {
     const templateVars = {
       user: users[req.cookies.user_id]
     };
-    res.render("register", templateVars);
+    if (req.cookies.user_id) {
+        res.redirect('/urls');
+      } else {
+        res.render("register", templateVars);
+      }
   });
   
   //Create a Registration Handler
