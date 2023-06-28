@@ -118,8 +118,25 @@ app.get("/login", (req, res) => {
 //The Login Route
 app.post("/login", (req, res) => {
     //const userName = req.body.username;
-    const user = users[req.cookies["user_id"]];
-    res.cookie('username', user.id);
+    const { email, password } = req.body;
+    if (!email || !password) {
+        res.status(400).send("Email and password cannot be empty");
+        return;
+      }
+    //
+    const existingUser= getUserByEmail(email);
+    if (!existingUser) {
+      res.status(403).send("Email is not registered");
+      return;
+    } else if (password !== existingUser.password ) {
+       res.status(403).send("Password is incorrect");
+       return;
+    }else {
+    res.cookie("user_id", existingUser.id);
+    }
+    
+    
+   
     res.redirect("/urls");
 });
 
