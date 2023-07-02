@@ -158,16 +158,16 @@ app.post("/register", (req, res) => {
     if (existingUser) {
       res.status(400).send("Email already registered");
       return;
-    } else {
+    }
       
-      const newuser = {
-      id: generateRandomString(),
-      email: req.body.email,
-      password: req.body.password
+    const newuser = {
+    id: generateRandomString(),
+    email: req.body.email,
+    password: req.body.password
     };
     users[newuser.id] = newuser;
     //res.cookie("user_id", newuser.id);
-    }
+    
     res.redirect("/urls");
 });
 
