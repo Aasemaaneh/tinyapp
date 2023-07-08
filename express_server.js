@@ -6,9 +6,8 @@ const bcrypt = require("bcryptjs");
 const PORT = 8080; 
 
 //Helperfunctions:
-const urlsForUser = require("./urlsForUser");
-const getUserByEmail = require("./getUserByEmail");
-const generateRandomString = require("./generateRandomString");
+const {generateRandomString, getUserByEmail, urlsForUser} = require("./helpers");
+
 
 // Middleware
 app.set("view engine", "ejs"); 
