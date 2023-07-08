@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-//const cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const PORT = 8080; 
@@ -12,7 +11,6 @@ const {generateRandomString, getUserByEmail, urlsForUser} = require("./helpers")
 // Middleware
 app.set("view engine", "ejs"); 
 app.use(express.urlencoded({ extended: true })); 
-//app.use(cookieParser());
 app.use(cookieSession({
     name: 'session',
     keys: ['secretKey'],
@@ -54,8 +52,15 @@ const users = {
 //Routing on Server
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+    const userId = req.session.user_id;
+    if (userId) {
+        res.redirect('/urls');
+        return;
+      } else {
+        res.redirect('/login');
+      }
 });
+
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
@@ -67,7 +72,6 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-    //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
     if (!userId) {
       res.send("<html><body>Please <a href='/login'>login</a> or <a href='/register'>register</a> to access URLs.</body></html>");
@@ -78,13 +82,13 @@ app.get("/urls", (req, res) => {
         urls: urlsForUser(userId,urlDatabase),
         user: users[userId]
     };
-    //console.log(templateVars);
+  
     res.render("urls_index", templateVars);
 });
 
 
 app.get("/urls/new", (req, res) => {
-    //const userId = req.cookies.user_id;
+  
     const userId = req.session.user_id;
     if(userId) {
       const templateVars = {
@@ -96,7 +100,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-    //const userId = req.cookies.user_id;
+
     const userId = req.session.user_id;
     const id = req.params.id;    
     if (!userId) {
@@ -119,7 +123,7 @@ app.get("/urls/:id", (req, res) => {
 
 
 app.post("/urls/:id", (req, res) => {
-  //const userId = req.cookies.user_id;
+  
   const userId = req.session.user_id;
   const id = req.params.id;
 
@@ -143,7 +147,6 @@ app.post("/urls/:id/post", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-    //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
     const id = req.params.id;
   
@@ -163,7 +166,6 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-    //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
     if (!userId) {
       res.status(401).send("<html><body>Please <a href='/login'>login</a> or <a href='/register'>register</a> to shorten URLs.</body></html>");
@@ -190,7 +192,6 @@ app.get("/u/:id", (req, res) => {
   
 
 app.get("/login", (req, res) => {
-    //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
     if (userId) {
         res.redirect('/urls');
@@ -203,7 +204,6 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    //const userName = req.body.username;
     const { email, password } = req.body;
     if (!email || !password) {
         res.status(400).send("Email and password cannot be empty");
@@ -218,7 +218,6 @@ app.post("/login", (req, res) => {
        res.status(403).send("Password is incorrect");
        return;
     }else {
-    //res.cookie("user_id", existingUser.id);
     req.session.user_id = existingUser.id;
     }
     res.redirect("/urls");
@@ -226,7 +225,6 @@ app.post("/login", (req, res) => {
 
 
 app.post("/logout", (req, res) => {
-    //res.clearCookie('user_id');
     req.session = null;
     res.redirect("/login");
 });
@@ -234,7 +232,6 @@ app.post("/logout", (req, res) => {
 
 
 app.get("/register", (req, res) => {
-    //const userId = req.cookies.user_id;
     const userId = req.session.user_id;
     if (userId) {
         res.redirect('/urls');
@@ -249,12 +246,12 @@ app.get("/register", (req, res) => {
 
 app.post("/register", (req, res) => {
     const { email, password } = req.body;
-    //
+    
     if (!email || !password) {
         res.status(400).send("Email and password cannot be empty");
         return;
       }
-    //
+
     const existingUser = getUserByEmail(email, users);
     if (existingUser) {
       res.status(400).send("Email already registered");
@@ -271,7 +268,6 @@ app.post("/register", (req, res) => {
 
     }
     
-    //res.redirect("/login");
     res.status(200).send("<html><body>Registered Successfully! Please <a href='/login'>login</a>.</body></html>");
 });
 
